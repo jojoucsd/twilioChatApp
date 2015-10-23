@@ -11,7 +11,8 @@
     "ejs": "^2.3.4",
     "express": "^4.13.3",
     "express-session": "^1.11.3",
-    "mongoose": "^4.1.5"
+    "mongoose": "^4.1.5",
+    "twilio": "^2.5.1"
   },
   "engines": {
     "node": "0.12.7"
