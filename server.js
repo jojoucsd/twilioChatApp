@@ -6,9 +6,10 @@ var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var db = require("./models/index");
-var http = require ('http');
+var http = require ('http').Server(app);
 var fs = require ('fs');
 var qs = require('querystring');
+var io = require('socket.io')(http);
 // require and load ENV variables
 require('dotenv').load();
 // var secret = require('./secret');
@@ -17,7 +18,7 @@ require('dotenv').load();
 // var authToken = secret.twillio_token;
 var accountSid = process.env.TWILLIO_SID;
 var authToken = process.env.TWILLIO_TOKEN;
-var 
+
 var client = require('twilio')(accountSid, authToken);
 
 
@@ -88,6 +89,12 @@ app.get('/', function(req, res) {
 	res.render("index");
 });
 
+io.on('connection', function(socket){
+	socket.on('chat message', function(msg){
+		io.emit('chat message', msg);
+	});
+});
+
 app.all('/call', function callWraper(req, res, next) {
 	twCall(keyIn.number, res);
 });
@@ -96,29 +103,29 @@ app.all('/text', function textWraper(req, res, next) {
 });
 
 // this is the route that Twilio's server pings to send us the text from the phone user
-app.get('/chatresponse', function chatWraper(req, res, next){
-	// configuring Twilio response from user texting my Twilio number
-	// var resp = new twilio.TwimlResponse();
+// app.get('/chatresponse', function chatWraper(req, res, next){
+// 	// configuring Twilio response from user texting my Twilio number
+// 	// var resp = new twilio.TwimlResponse();
 
-	// resp.say('Welcome to Twilio!');
-	// resp.say('Please let us know if we can help during your development.', {
-	// 	voice:'woman',
-	// 	language:'en-gb'
-	// });
+// 	// resp.say('Welcome to Twilio!');
+// 	// resp.say('Please let us know if we can help during your development.', {
+// 	// 	voice:'woman',
+// 	// 	language:'en-gb'
+// 	// });
 
-	// console.log(resp.toString());
-	// // var texts = twTextRec();
-	// // res.json(texts);
-	// res.send(resp);
-	http.createServer(function (req, res) {
-		var twiml = new twilio.TwimlResponse();
-		twiml.message("Thanks for the text");
-		res.writeHead(200, {'Content-Type': 'text/xml'})
-		console.log(twiml);
-		res.end(twiml.toString());
-	})
-})
-app.listen(process.env.PORT || 3000, function() {
+// 	// console.log(resp.toString());
+// 	// // var texts = twTextRec();
+// 	// // res.json(texts);
+// 	// res.send(resp);
+// 	http.createServer(function (req, res) {
+// 		var twiml = new twilio.TwimlResponse();
+// 		twiml.message("Thanks for the text");
+// 		res.writeHead(200, {'Content-Type': 'text/xml'})
+// 		console.log(twiml);
+// 		res.end(twiml.toString());
+// 	})
+// })
+http.listen(process.env.PORT || 3000, function() {
 	console.log("twilioChat is running on port 3000");
 });
 
