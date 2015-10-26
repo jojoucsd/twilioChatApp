@@ -16,7 +16,8 @@ require('dotenv').load();
 // var accountSid = secret.twillio_sid;
 // var authToken = secret.twillio_token;
 var accountSid = process.env.TWILLIO_SID;
-
+var authToken = process.env.TWILLIO_TOKEN;
+var 
 var client = require('twilio')(accountSid, authToken);
 
 
