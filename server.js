@@ -109,6 +109,7 @@ app.get('/chatresponse', function chatWraper(req, res, next){
 		var twiml = new twilio.TwimlResponse();
 		twiml.message("Thanks for the text");
 		res.writeHead(200, {'Content-Type': 'text/xml'})
+		console.log(twiml);
 		res.end(twiml.toString());
 	})
 })
