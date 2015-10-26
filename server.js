@@ -9,10 +9,14 @@ var db = require("./models/index");
 var http = require ('http');
 var fs = require ('fs');
 var qs = require('querystring');
-var secret = require('./secret');
+// require and load ENV variables
+require('dotenv').load();
+// var secret = require('./secret');
 
-var accountSid = secret.twillio_sid;
-var authToken = secret.twillio_token;
+// var accountSid = secret.twillio_sid;
+// var authToken = secret.twillio_token;
+var accountSid = process.env.TWILLIO_SID;
+
 var client = require('twilio')(accountSid, authToken);
 
 
