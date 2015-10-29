@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <%- include _head.ejs %>
+
+<body>
+  <%- include _navbar.ejs %>
+  <h1><a href="/chatcenter">Chat Center</a></h1>
+  <p>You ChatRoom Name <%= chat.name%> <%= chat.number %>.</p>
+
+  <div id="messages">
+    <!-- this could be another partial, just FYI -->
+    <form id="new-message" data-id="<%= chat._id %>">
+      <input type="text" name="body">
+      <input type="submit" value="Add your message">
+    </form>
+
+    <h3>Messages List:</h3>
+      <div class= "chatrooms list-group" id="message-list">
+      <!--  display all the pizzas from the database-->
+      <% chat.messages.forEach(function(message) { %>
+        <!-- interpolate the id into the link to take user to pizza show page -->
+        <p><%= message.body %></p>
+      <% }); %>
+    </div>
+  </div>
+</body>
+</html>

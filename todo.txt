@@ -1,0 +1,19 @@
+conversations#index
+	see conversations
+	click on them to go to conversation-show
+conversations#show
+	Sending text messages
+	recieve text messages sychronously (with refresh)
+	recieve text messages with socket.io
+
+
+
+DONE user model
+	DONE express-session
+	DONE signup
+	DONE login
+
+
+
+Teddy the texter - I have a pain in my knee. I text 1800texthelpnow that "I have a pain in my knee". They respond.
+Nelly the nurse - I'm sitting at my computer and am logged in to texthelpnow and I see "I have a pain in my knee", and can respond and have a conversation.

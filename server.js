@@ -10,6 +10,7 @@ var http = require ('http').Server(app);
 var fs = require ('fs');
 var qs = require('querystring');
 var io = require('socket.io')(http);
+var session =  require('express-session');
 // require and load ENV variables
 require('dotenv').load();
 // var secret = require('./secret');
@@ -21,111 +22,190 @@ var authToken = process.env.TWILLIO_TOKEN;
 
 var client = require('twilio')(accountSid, authToken);
 
-
-function twCall(inputNum, res) {
-	client.calls.create({
-		to: inputNum,
-		from: "+16504168665",
-		url: "http://demo.twilio.com/docs/voice.xml",
-		applicationSid: "APa894ccc18916d5496c35bbe7bd7f07bc",
-		method: "GET",
-		fallbackMethod: "GET",
-		statusCallbackMethod: "GET",
-		record: "false"
-	}, function(err, call) {
-		if (err) return console.error(err);
-		console.log(call.sid);
-		res.render('food', {
-			title: "twCall",
-			message: "Call Section ID: " + call.sid,
-			bravo: "Finish twCall"
-		})
-	});
-};
-
-function twText(inputNum, res) {
+//Outgoing text function
+function twText(req, res) {
 	client.messages.create({
 		body: "This is Ling",
-		to: keyIn.number,
+		to: "+14158126840",
 		from: "+16504168665"
 	}, function(err, message) {
 		if (err) return console.error(err);
 		console.log(message.sid);
-		res.render('food', {
-			title: "twText",
-			message: "Message Section ID: " + message.sid,
-			bravo: "Finish twText"
-		})
-	});
+		res.send(message.sid);
+	})
 };
 
-function twTextRec(url, res){
-	// this gets a single message
-	client.messages("SMef52737a542e41bc9dbd7d13fee926fa").get(function(err, message) {
-		console.log(message.body);
-	});
-	// this is for getting all of the messages
-	// client.messages.list(function(err, data){
-	// 	data.messages.forEach(function(message){
-	// 		console.log(message.body);
-	// 		res.send(data);
-	// 	});
-	// });
-}
-
-// http.createServer(function (req, res) {
-// 	var twiml = new twilio.TwimlResponse();
-// 	twiml.message("Thanks for the text");
-// 	res.writeHead(200, {'Content-Type': 'text/xml'})
-// 	res.end(twiml.toString());
-// })
-
-app.set("view engine", "ejs");
-app.use(express.static("public"));
-app.use(bodyParser.urlencoded({extended: true}));
-
-
-app.get('/', function(req, res) {
-	res.render("index");
-});
-
 io.on('connection', function(socket){
-	socket.on('chat message', function(msg){
+	console.log("user connected, socket open");
+	socket.on('sendMessage', function(msg){
+		// save the message
+
+		// emit the message to the chat room
 		io.emit('chat message', msg);
 	});
 });
 
-app.all('/call', function callWraper(req, res, next) {
-	twCall(keyIn.number, res);
+//mongoose.connect('mongodb://localhost/twilioChat-login')
+var db = require('./models/index');
+
+app.set("view engine", "ejs");
+app.use(express.static("public"));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(session({
+	saveUninitialized: true,
+	resave: true,
+	secret: 'SuperSecretCookie',
+	cookie: { maxAge: 30 * 60 * 1000 }
+}));
+
+app.get('/test', function(req,res) {
+	res.render('test');
+})
+
+//Routes
+app.get('/', function(req, res) {
+	res.render("index");
 });
-app.all('/text', function textWraper(req, res, next) {
-	twText(keyIn.number, res);
+
+app.get('/signup', function (req, res) {
+	res.render('signup');
 });
+
+app.post('/users', function (req, res) {
+	console.log(req.body);
+	db.User.createSecure(req.body.email, req.body.password, function (err, newUser) {
+		req.session.userId = newUser._id;
+		res.redirect('/chatcenter');
+	});
+});
+
+// authenticate the user and set the session
+app.post('/sessions', function (req, res) {
+  console.log('attempted signin: ', req.body);
+  // call authenticate function to check if password user entered is correct
+  db.User.authenticate(req.body.email, req.body.password, function (err, loggedInUser) {
+  	if (err){
+  		console.log('authentication error: ', err);
+  		res.status(500).send();
+  	} else {
+  		console.log('setting session user id ', loggedInUser._id);
+  		req.session.userId = loggedInUser._id;
+  		res.redirect('/chatcenter');
+  	}
+  });
+});
+
+// show user profile page
+// shows all chats
+app.get('/chatcenter', function (req, res) {
+	console.log('session user id: ', req.session.userId);
+  // find the user currently logged in
+  db.User.findOne({_id: req.session.userId}, function (err, currentUser) {
+  	if (err){
+  		console.log('database error: ', err);
+  		res.redirect('/conversation');
+  	} else {
+      // render profile template with user's data
+      console.log('loading profile of logged in user: ', currentUser);
+  }
+  db.Chat.find({}, function(err, chats){
+  	if (err) { res.json(err) }
+  		console.log("chats to load for conversations-index", chats);
+  	res.render('conversations-index',{chats: chats});
+  })
+});
+});
+
+app.get('/logout', function (req, res) {
+  // remove the session user id
+  req.session.userId = null;
+  // redirect to login (for now)
+  res.redirect('/');
+});
+
+app.post('/chats', function (req, res){	
+	console.log(req.body);
+	db.Chat.create(req.body, function(err, chat){
+		if(err) {
+			res.json(err);
+		} else {
+			console.log(chat);
+			res.json(chat);
+		} 
+	})
+});
+
+app.get('/chats/:_id', function (req, res){
+	console.log(req.params);
+	db.Chat.findById(req.params._id, function(err, chat){
+		if (err) {
+			res.json(err);
+		}else{
+			res.render('conversation-show', {chat: chat})
+		}
+	});
+});
+
+
+
+app.delete('/chats/:_id', function (req, res){
+	console.log("chat id is", req.params);
+	db.Chat.find({
+		_id: req.params._id
+	}).remove(function(err, chat){
+		console.log("Chat Removed");
+		res.json("Chat Gone?")
+	})
+})
+
+// makes a message for a specific chat
+app.post('/chats/:_id/messages', function (req, res) {	
+	var message = new db.Message(req.body);
+	console.log("message is: ", message);
+	db.Chat.findById(req.params._id, function(err, chat){
+		if(err) { res.json(err) }
+			chat.messages.push(message);
+		chat.save();
+		console.log('message is: ', message);
+		console.log('this chatroom messages are: ', chat.messages);
+		res.json(message);
+	})
+	client.messages.create({
+		body: message.body,
+		to: "+14158126840",
+		from: "+16504168665"
+	}, function(err, message) {
+		if (err) return console.error(err);
+		console.log(message.sid);
+		res.send(message.sid);
+	})
+})
+
+
+app.post('/message/recieve', function (req, res) {
+	// Recieve message
+	console.log(req.body.from);
+	console.log(req.body.to);
+	console.log(req.param('From'));
+	console.log(req.param('Body'));
+
+})
+
+// user.js
+// message.js
 
 // this is the route that Twilio's server pings to send us the text from the phone user
-// app.get('/chatresponse', function chatWraper(req, res, next){
-// 	// configuring Twilio response from user texting my Twilio number
-// 	// var resp = new twilio.TwimlResponse();
+// CHATWRAPPER
+app.all('/chatRoom', function (req, res, next) {
+	console.log(req.body.from);
+	console.log(req.body.to);
+	console.log(req.param('From'));
+	console.log(req.param('Body'));
+	//look up chat by phone number, construct new object message, push in to chat message
+	//prodcast new mesg
+});
 
-// 	// resp.say('Welcome to Twilio!');
-// 	// resp.say('Please let us know if we can help during your development.', {
-// 	// 	voice:'woman',
-// 	// 	language:'en-gb'
-// 	// });
-
-// 	// console.log(resp.toString());
-// 	// // var texts = twTextRec();
-// 	// // res.json(texts);
-// 	// res.send(resp);
-// 	http.createServer(function (req, res) {
-// 		var twiml = new twilio.TwimlResponse();
-// 		twiml.message("Thanks for the text");
-// 		res.writeHead(200, {'Content-Type': 'text/xml'})
-// 		console.log(twiml);
-// 		res.end(twiml.toString());
-// 	})
-// })
-http.listen(process.env.PORT || 3000, function() {
+http.listen(3000, function() {
 	console.log("twilioChat is running on port 3000");
 });
 

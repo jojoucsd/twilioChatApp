@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<%- include _head.ejs %>
+
+<body>
+  <%- include _navbar.ejs %>
+  
+  <div class="jumbotron bpe-jumbotron">
+    <h1>Chat Center</h1>
+    <hr>
+    <h2>Welcome! You Logged In</h2>
+    </div>
+    <div class="container conversations">
+      <div class="row">
+      <div class="col-md-4 col-md-offset-4">
+      
+      <% include ./_create %>
+
+          <div class="list-group" id="chats-ul">
+          <h3>Your Chats</h3>
+          <% chats.forEach(function(chat) { %>
+            <!-- interpolate the id into the link to take user to pizza show page -->
+            <p><a href="/chats/<%= chat._id %>"><%= chat.name %> <%= chat.number %></a><span data-id="<%= chat._id %>" class='glyphicon glyphicon-trash pull-right'></span></p>
+
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>
