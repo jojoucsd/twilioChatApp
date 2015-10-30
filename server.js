@@ -169,7 +169,7 @@ app.post('/chats/:_id/messages', function (req, res) {
 })
 
 function createMessage(chat, message, callback) {
-	console.log(message)
+	//console.log(message)
 	chat.messages.push(message);
 	chat.save(function(err) {
 		console.log(chat)    

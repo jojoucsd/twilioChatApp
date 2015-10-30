@@ -20,7 +20,7 @@ $(document).ready(function(){
       // append new chatroom to the page
       var newChat = chatroom;
       // clear new food form
-      var chatroomName = "<p><a 'href='/chats/" + data._id + "'>" + data.name + " " + data.number + "</a><span data-id='<%= chat._id %>' class='glyphicon glyphicon-hdd pull-right'></span><p>"
+      var chatroomName = "<p><a href='/chats/" + data._id + "'>" + data.name + " " + data.number + "</a><span data-id='<%= chat._id %>' class='glyphicon glyphicon-hdd pull-right'></span><p>"
       //console.log(chatroomName)
       $("#chats-ul").append(chatroomName);
       // reset the form 

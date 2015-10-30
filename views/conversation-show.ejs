@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <%- include _head.ejs %>
+<%- include _head.ejs %>
 
 <body>
   <%- include _navbar.ejs %>
   <h1><a href="/chatcenter">Chat Center</a></h1>
   <p>This ChatRoom's Name is: <%= chat.name%></p>
   <p>Phone Number is: <%= chat.number %></p>
-
-  <div id="messages">
-    <h3>Messages List:</h3>
+  <div class="col-md-4 col-md-offset-4">   
+    <div id="messages">
+      <h3>Messages List:</h3>
       <div class= "chatrooms list-group" id="message-list">
-      <!--  display all the pizzas from the database-->
-      <% chat.messages.forEach(function(message) { %>
+        <!--  display all the pizzas from the database-->
+        <% chat.messages.forEach(function(message) { %>
         <!-- interpolate the id into the link to take user to pizza show page -->
         <p><%= message.Body %></p>
-      <% }); %>
+        <% }); %>
+      </div>
     </div>
   </div>
   <% include ./_inputMsg %>

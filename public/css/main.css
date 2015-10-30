@@ -1,12 +1,18 @@
 .navbar {
 	margin:0;
 }
-/*#page-wrapper {
-	background-color: lightblue;
+html, body {
+  height: 100%
 }
+
+p {
+	font-size: x-large;
+	text-align:;
+}
+
 .jumbotron {
 	text-align: center;
-	color: blue;
+	color: black;
 }
 
 .container { margin: 0; padding: 0; box-sizing: border-box; }
