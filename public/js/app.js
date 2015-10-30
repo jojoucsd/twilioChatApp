@@ -1,16 +1,23 @@
 // CLIENT-SIDE JAVASCRIPT
 // On page load
+
+
+
 $(document).ready(function(){
   console.log('Hey, Earth!')
 
-  var socket = io();
-  $('#new-message').submit(function(){
+  
+  /*$('#new-message').submit(function(){
     socket.emit('chat message', $('#m').val());
     $('#m').val('');
     return false;
-  });
-  socket.on('chat message', function(msg){
-    $('#messages').append($('<li>').text(msg));
+  });*/
+
+  var socket = io();
+
+  socket.on('message', function(msg){
+    console.log("this msg is ", msg)
+    $('#messages').append($('<li>').text(msg.Body));
   });
 
   $("#newConversation").on("submit", function(e){
@@ -35,11 +42,19 @@ $(document).ready(function(){
 
       $('#new-message').on('submit', function(e) {
         e.preventDefault();
-        var messageData = $(this).serialize();
+  
+        var messageData = $("[name='messagebody']", this).val();
+        console.log("t is ",messageData)
+        var input = { "message" : messageData,
+        chatId : $(this).data().id
+        }
+        console.log("input is ", input);
+
         var url = "/chats/" + $(this).data().id + "/messages"
-        $.post(url, messageData, function(data) {
+        $.post(url, input, function(message) {
           // make HTML string to append to page
-          var newMessage = "<p>" + data.body + "</p>";
+          var newMessage = "<p>" + message.Body + "</p>";
+          
   // append the HTML string to the element with an id of 'comment-list' in the DOM
           $('#message-list').append(newMessage);
         })

@@ -13,6 +13,13 @@ var io = require('socket.io')(http);
 var session =  require('express-session');
 // require and load ENV variables
 require('dotenv').load();
+
+io.on('connection', function(socket) {
+
+	console.log("connected on server")
+		
+});
+
 // var secret = require('./secret');
 
 // var accountSid = secret.twillio_sid;
@@ -35,15 +42,14 @@ function twText(req, res) {
 	})
 };
 
-io.on('connection', function(socket){
-	console.log("user connected, socket open");
+/*	console.log("user connected, socket open");
 	socket.on('sendMessage', function(msg){
 		// save the message
 
 		// emit the message to the chat room
 		io.emit('chat message', msg);
 	});
-});
+});*/
 
 //mongoose.connect('mongodb://localhost/twilioChat-login')
 var db = require('./models/index');
@@ -160,17 +166,19 @@ app.delete('/chats/:_id', function (req, res){
 
 // makes a message for a specific chat
 app.post('/chats/:_id/messages', function (req, res) {	
-	var message = new db.Message(req.body);
-	console.log("message is: ", message);
-	db.Chat.findById(req.params._id, function (err, chat){
-		if(err) { res.json(err) }
+
+	var message = new db.Message({Body: req.body.message});
+	db.Chat.findById(req.body.chatId, function (err, chat){
+		if(err) { 
+			res.json(err); 
+		}else{
 			chat.messages.push(message);
 			chat.save();
-
-		// Twilio API call
+		}
+		//Twilio API call
 		client.messages.create({
-			body: message.body,
-			to: "+14158126840",
+			body: message.Body,
+			to: chat.number,
 			from: "+16504168665"
 		}, function(err, message) {
 			if (err) return console.error(err);
@@ -189,14 +197,17 @@ function createMessage(chat, message, callback) {
 	console.log(message)
 	chat.messages.push(message);
 	chat.save(function(err) {
-		console.log(chat)
-		callback(message)
+	console.log(chat)    
+	io.emit("message", message);
+
+	callback("good");
 	});	
 	
 }
 
 app.post('/message/recieve', function (req, res) {
 	// Recieve message
+	console.log(req.body);
 	 var message = req.body;
 	 console.log("incoming is :", message);
 	 // db.Chat.save(function (err, msg){
@@ -216,8 +227,7 @@ app.post('/message/recieve', function (req, res) {
 				});
 			}
 	 	});
-		// chat.save();
-	// find chat 
+		
 		// push msg in to chat.messages
 		// chat.messages.push(msg);
 		// save chat
