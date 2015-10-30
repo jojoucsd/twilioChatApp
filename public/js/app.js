@@ -51,7 +51,7 @@ $(document).ready(function(){
 
         var chatId = $(this).data().id;
         console.log(chatId);
-        var chat = $(this).closet('p');
+        var chat = $(this).closest('p');
 
         $.ajax({
           type: "DELETE",

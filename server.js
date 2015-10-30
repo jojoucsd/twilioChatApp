@@ -137,7 +137,7 @@ app.post('/chats', function (req, res){
 
 app.get('/chats/:_id', function (req, res){
 	console.log(req.params);
-	db.Chat.findById(req.params._id, function(err, chat){
+	db.Chat.findById(req.params._id).populate('messages').exec(function (err, chat){
 		if (err) {
 			res.json(err);
 		}else{
@@ -162,50 +162,75 @@ app.delete('/chats/:_id', function (req, res){
 app.post('/chats/:_id/messages', function (req, res) {	
 	var message = new db.Message(req.body);
 	console.log("message is: ", message);
-	db.Chat.findById(req.params._id, function(err, chat){
+	db.Chat.findById(req.params._id, function (err, chat){
 		if(err) { res.json(err) }
 			chat.messages.push(message);
-		chat.save();
+			chat.save();
+
+		// Twilio API call
+		client.messages.create({
+			body: message.body,
+			to: "+14158126840",
+			from: "+16504168665"
+		}, function(err, message) {
+			if (err) return console.error(err);
+			console.log(message.sid);
+			// res.send(message.sid);
+		})
+
 		console.log('message is: ', message);
 		console.log('this chatroom messages are: ', chat.messages);
+		// response to my browser client
 		res.json(message);
-	})
-	client.messages.create({
-		body: message.body,
-		to: "+14158126840",
-		from: "+16504168665"
-	}, function(err, message) {
-		if (err) return console.error(err);
-		console.log(message.sid);
-		res.send(message.sid);
 	})
 })
 
+function createMessage(chat, message, callback) {
+	console.log(message)
+	chat.messages.push(message);
+	chat.save(function(err) {
+		console.log(chat)
+		callback(message)
+	});	
+	
+}
 
 app.post('/message/recieve', function (req, res) {
 	// Recieve message
-	console.log(req.body.from);
-	console.log(req.body.to);
-	console.log(req.param('From'));
-	console.log(req.param('Body'));
-
+	 var message = req.body;
+	 console.log("incoming is :", message);
+	 // db.Chat.save(function (err, msg){
+	 	console.log(message.From)
+	 	db.Chat.findOne({number: parseInt(message.From)}).exec(function (err, chat) {
+	 		if (!chat) {
+	 			db.Chat.create({ number: message.From }, function(err, chat) {
+	 				createMessage(chat,message, function (message) {
+	 					res.json(message)
+	 				});
+	 			});
+	 		} else if(err) { 
+				res.json(err) 
+			} else {	
+				createMessage(chat, message, function (message) {
+					res.json(message)
+				});
+			}
+	 	});
+		// chat.save();
+	// find chat 
+		// push msg in to chat.messages
+		// chat.messages.push(msg);
+		// save chat
+		// chat.save(function(err) {
+			// socket broadcast to room (msg)
+			// socket.in(msg.From).emit("newMessage", msg);
+			// res.status(200);
+		 // })
+	//})
 })
 
-// user.js
-// message.js
 
-// this is the route that Twilio's server pings to send us the text from the phone user
-// CHATWRAPPER
-app.all('/chatRoom', function (req, res, next) {
-	console.log(req.body.from);
-	console.log(req.body.to);
-	console.log(req.param('From'));
-	console.log(req.param('Body'));
-	//look up chat by phone number, construct new object message, push in to chat message
-	//prodcast new mesg
-});
-
-http.listen(3000, function() {
+http.listen(process.env.PORT || 3000, function() {
 	console.log("twilioChat is running on port 3000");
 });
 
