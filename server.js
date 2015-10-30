@@ -14,46 +14,23 @@ var session =  require('express-session');
 // require and load ENV variables
 require('dotenv').load();
 
+//io on , socket is open server side
 io.on('connection', function(socket) {
 
 	console.log("connected on server")
-		
+
 });
 
-// var secret = require('./secret');
-
-// var accountSid = secret.twillio_sid;
-// var authToken = secret.twillio_token;
+//twilio login info
 var accountSid = process.env.TWILLIO_SID;
 var authToken = process.env.TWILLIO_TOKEN;
 
 var client = require('twilio')(accountSid, authToken);
 
-//Outgoing text function
-function twText(req, res) {
-	client.messages.create({
-		body: "This is Ling",
-		to: "+14158126840",
-		from: "+16504168665"
-	}, function(err, message) {
-		if (err) return console.error(err);
-		console.log(message.sid);
-		res.send(message.sid);
-	})
-};
-
-/*	console.log("user connected, socket open");
-	socket.on('sendMessage', function(msg){
-		// save the message
-
-		// emit the message to the chat room
-		io.emit('chat message', msg);
-	});
-});*/
-
 //mongoose.connect('mongodb://localhost/twilioChat-login')
 var db = require('./models/index');
 
+//setting views and use modules
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -64,11 +41,7 @@ app.use(session({
 	cookie: { maxAge: 30 * 60 * 1000 }
 }));
 
-app.get('/test', function(req,res) {
-	res.render('test');
-})
-
-//Routes
+//Login Signup Routes
 app.get('/', function(req, res) {
 	res.render("index");
 });
@@ -87,12 +60,13 @@ app.post('/users', function (req, res) {
 
 // authenticate the user and set the session
 app.post('/sessions', function (req, res) {
-  console.log('attempted signin: ', req.body);
+	console.log('attempted signin: ', req.body);
   // call authenticate function to check if password user entered is correct
   db.User.authenticate(req.body.email, req.body.password, function (err, loggedInUser) {
   	if (err){
   		console.log('authentication error: ', err);
   		res.status(500).send();
+  		res.redirect('/');
   	} else {
   		console.log('setting session user id ', loggedInUser._id);
   		req.session.userId = loggedInUser._id;
@@ -101,7 +75,7 @@ app.post('/sessions', function (req, res) {
   });
 });
 
-// show user profile page
+//loged in main page
 // shows all chats
 app.get('/chatcenter', function (req, res) {
 	console.log('session user id: ', req.session.userId);
@@ -109,7 +83,7 @@ app.get('/chatcenter', function (req, res) {
   db.User.findOne({_id: req.session.userId}, function (err, currentUser) {
   	if (err){
   		console.log('database error: ', err);
-  		res.redirect('/conversation');
+  		res.redirect('/');
   	} else {
       // render profile template with user's data
       console.log('loading profile of logged in user: ', currentUser);
@@ -117,7 +91,7 @@ app.get('/chatcenter', function (req, res) {
   db.Chat.find({}, function(err, chats){
   	if (err) { res.json(err) }
   		console.log("chats to load for conversations-index", chats);
-  	res.render('conversations-index',{chats: chats});
+  	res.render('conversations-index',{chats: chats, user: currentUser});
   })
 });
 });
@@ -129,18 +103,21 @@ app.get('/logout', function (req, res) {
   res.redirect('/');
 });
 
+//Rotues for Main App
 app.post('/chats', function (req, res){	
-	console.log(req.body);
+	//console.log(req.body);
+	//create chats and save to MongoDB
 	db.Chat.create(req.body, function(err, chat){
 		if(err) {
 			res.json(err);
 		} else {
-			console.log(chat);
+			//console.log(chat);
 			res.json(chat);
 		} 
 	})
 });
 
+//find routes by id
 app.get('/chats/:_id', function (req, res){
 	console.log(req.params);
 	db.Chat.findById(req.params._id).populate('messages').exec(function (err, chat){
@@ -152,14 +129,13 @@ app.get('/chats/:_id', function (req, res){
 	});
 });
 
-
-
+//should not be an delete route, will need to change in the future
 app.delete('/chats/:_id', function (req, res){
-	console.log("chat id is", req.params);
+	//console.log("chat id is", req.params);
 	db.Chat.find({
 		_id: req.params._id
 	}).remove(function(err, chat){
-		console.log("Chat Removed");
+	//	console.log("Chat Removed");
 		res.json("Chat Gone?")
 	})
 })
@@ -185,9 +161,8 @@ app.post('/chats/:_id/messages', function (req, res) {
 			console.log(message.sid);
 			// res.send(message.sid);
 		})
-
-		console.log('message is: ', message);
-		console.log('this chatroom messages are: ', chat.messages);
+		//console.log('message is: ', message);
+		//console.log('this chatroom messages are: ', chat.messages);
 		// response to my browser client
 		res.json(message);
 	})
@@ -197,21 +172,20 @@ function createMessage(chat, message, callback) {
 	console.log(message)
 	chat.messages.push(message);
 	chat.save(function(err) {
-	console.log(chat)    
-	io.emit("message", message);
-
-	callback("good");
+		console.log(chat)    
+		io.emit("message", message);
+//twilio is expecting something else thant this callback, fix it later
+		callback("good");
 	});	
 	
 }
-
+//inbound msg route
 app.post('/message/recieve', function (req, res) {
 	// Recieve message
-	console.log(req.body);
-	 var message = req.body;
-	 console.log("incoming is :", message);
-	 // db.Chat.save(function (err, msg){
-	 	console.log(message.From)
+//	console.log(req.body);
+	var message = req.body;
+//	console.log("incoming is :", message);
+//	 	console.log(message.From)
 	 	db.Chat.findOne({number: parseInt(message.From)}).exec(function (err, chat) {
 	 		if (!chat) {
 	 			db.Chat.create({ number: message.From }, function(err, chat) {
@@ -220,23 +194,13 @@ app.post('/message/recieve', function (req, res) {
 	 				});
 	 			});
 	 		} else if(err) { 
-				res.json(err) 
-			} else {	
-				createMessage(chat, message, function (message) {
-					res.json(message)
-				});
-			}
+	 			res.json(err) 
+	 		} else {	
+	 			createMessage(chat, message, function (message) {
+	 				res.json(message)
+	 			});
+	 		}
 	 	});
-		
-		// push msg in to chat.messages
-		// chat.messages.push(msg);
-		// save chat
-		// chat.save(function(err) {
-			// socket broadcast to room (msg)
-			// socket.in(msg.From).emit("newMessage", msg);
-			// res.status(200);
-		 // })
-	//})
 })
 
 

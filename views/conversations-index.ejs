@@ -6,9 +6,16 @@
   <%- include _navbar.ejs %>
   
   <div class="jumbotron bpe-jumbotron">
-    <h1>Chat Center</h1>
+    <h1>SmS Chats Center</h1>
     <hr>
-    <h2>Welcome! You Logged In</h2>
+    <h4>Greeting!
+                <% if (user && user.email) { %>
+                  You're logged in as <%= user.email %>!</h1>
+                  <a href="/logout" class="btn btn-default">Log Out</a>
+                <% } else { %>
+                  You're not logged in. </h4>
+                  <a href="/">Log in</a>
+                <% } %>
     </div>
     <div class="container conversations">
       <div class="row">
@@ -17,10 +24,10 @@
       <% include ./_create %>
 
           <div class="list-group chatrooms" id="chats-ul">
-          <h3>Your Chats</h3>
+          <h3>Conversation Lists</h3>
           <% chats.forEach(function(chat) { %>
             <!-- interpolate the id into the link to take user to pizza show page -->
-            <p><a href="/chats/<%= chat._id %>"><%= chat.name %> <%= chat.number %></a><span data-id="<%= chat._id %>" class='glyphicon glyphicon-trash pull-right'></span></p>
+            <p><a href="/chats/<%= chat._id %>"><%= chat.name %> <%= chat.number %></a><span data-id="<%= chat._id %>" class='glyphicon glyphicon-hdd pull-right'></span></p>
 
             <% }); %>
           </div>

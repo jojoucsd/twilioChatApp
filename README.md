@@ -1,118 +1,13 @@
-## Getting set up on Heroku with Node + Mongoose
+twilio-socket.io-chat App
 
-### Before you do anything
-1) Let's remove the link to the repo we cloned and commit the starting point of our project in a local git repo. We can check the location of the remote repository by typing: `git remote -v`. In order to remove the link to the class repo, type: `git remote remove origin`. You can confirm this was successful with the first command.
+Greeting, this is my first project from my GA WDI learning. The past seven days is be a fun ride for me as I can really experiences myself as a developer. I got to bed with my laptop and the first thing I do when I open my eyes is turning on my laptop as well. 
 
-If so, your app is still under version control with `git` but it only has a local repository. You can run `git status` to make sure. If not, just type `git init` to make it into one again. __Stop and commit your changes.__
+This project used basic Javascript, jQuery, MongoDB/Mongoose, Html/CSS and mainily focus how twilio and socket.io is working with the server and client relationship. The project first started with just me playing around with Twilio's api and wanting to test how voice ip really function in the interweb. As speaking with Braus with my idea of project. He took my tiny "reminder app" to the next level. Inspried by his idea, I am trying to make this app a two way communication app that users can inter-exchange messages.
 
-2) Sign up for an account with heroku: https://www.heroku.com/
+The main goal of this app is to achieve a minimum function of "text help desk" in today's standard. The example Braus and me come up is hypothetically in the "Third World" or developing countries when not everyone is having a smart phone with wifi and not everyone can accesss with a laptop or pcs. This app will work as turning any possible pcs or macs with internet connection as a phone. 
 
-3) Install the heroku toolbelt - [https://toolbelt.heroku.com/](https://toolbelt.heroku.com/)
+One of the example is, a nurse logged in with this app and keep tracking his or her conversation with old and new paitents and answersing all the "low level" questions which today, most doctors would not appericated to answer. One nurse can handle multiple clients and also saving commute time. In the long run, all these data (messages) are saved in the data base where data analyst can implement search and automated answers as database is growing bigger. And eventually the nurse will only have to answer "serious" questions and all the "greet" and "low hanging" answers will be answers by auto-text machine.
 
-**(NOTE YOUR PROJECT MUST BE A GIT REPO TO CONTINUE.)**.
+The Making! To be honest, I did not build a skateboard than a bike than a car. Although I don't consider my app is a car yet, but at least it is moving. The way of my making process is more of an assembly line style. First, I spent two full days reading twilio's Docs and looking for examples and similar apps in node.js through out the internet. Unfortunately, there is not much help I found and I end up did not use any of my reading nor twilio's out going twilhml docs. Without any help from the internet, I turned to seeking help from the instructor. Matt helped me with the MogoDB models and I was able to reference "chats" with "users" and embed messages in to chats. With the most difficult parts is done. I buildted my outbound function of twilio and have my login and sign up set up done first. Than I am start working on my rotues of the backend. And I run out of time with bootstrap and css, which is something I will go back to finish it.
 
-### Heroku Setup
-
-4) Add a new remote to your project that points to Heroku's servers:
-
-```bash
-    heroku create
-    //OR
-    heroku create YOUR_APP_NAME
-```
-
-5) In your `server.js` file, modify `app.listen` to use `process.env.PORT` (this will be set, dynamically, by Heroku):
-
-```javascript
-    app.listen(process.env.PORT || 3000)
-```
-
-6) Tell heroku to use the mongolab addon. In your terminal, run:
-
-```bash
-    heroku addons:create mongolab
-```
-
-7) At this point, the command line may ask you to enter a credit card number. Heroku charges for some services, or if you go over some data limits. With the tools we're using and the size of our projects' data, everything should be free.  If you had to enter in a credit card, run the `heroku addons:create mongolab` command again. __You may need to wait a few minutes for mogolab to become active.__
-
-8) Update your database connection to point to Heroku's database. Open `models/index.js` and add the following to the `mongoose.connect` method:
-
-```javascript
-    mongoose.connect( process.env.MONGOLAB_URI ||
-                      process.env.MONGOHQ_URL || 
-                      "YOUR OWN LOCAL URL HERE" )
-```
-
-Congrats! Your application knows what port to run on, and what database to connect to - you're almost all set up to work in "production" on Heroku's servers!
-
-### Confirm your Dependencies
-
-9) Double check your `package.json` to make sure that all your depenedencies are present. If something is missing install it.
-
-Here are some common dependencies:  
-``` javascript
-    {
-      "dependencies": {
-        "body-parser": "^1.14.1",
-        "ejs": "^2.3.4",
-        "express": "^4.13.3",
-        "express-session": "^1.11.3",
-        "mongoose": "^4.1.5"
-      }
-    }
-```
-
-For example, if you're using body-parser but don't have it listed in your package.json `dependencies`, run the following:
-
-```bash
-    npm install body-parser --save
-```
-
-### Check the start script
-10) Check a `start` script for your application in your `package.json`:
-
-```javascript
-...
-  "scripts": {
-    "start": "node server.js"
-   }
-...
-```
-
-This is assuming your main application file is called `server.js`. If your main file is called something else, adjust the script to use your file name.
-
-### Check the Procfile
-11) Notice we have a `Procfile` so that Heroku knows how to run your application. If you do not have a Procfile, create one:
-    - Make sure you are in your main project directory (the same directory as `server.js`). Then run:  
-``` bash
-    touch Procfile
-    echo "web: node server.js" >> Procfile
-```
-
-### Deploy!
-12) Stop and commit. We've made a lot of changes!
-``` bash
-    git add . -A
-    git commit -m "ready for heroku deploy attempt #1"
-```
-
-13) Now we can deploy:
-``` bash
-    git push heroku master
-```
-
-If you missed a step just ask for help. Otherwise you should be able to visit your application by saying the following:
-
-```bash
-    heroku open
-```
-
-## Debugging Tips
-
-Here are some helpful commands for debugging your application on Heroku:
-
-#### `heroku logs`
-This command lists your most recent application server logs. Helpful for figuring out why your application may be crashing and burning.
-
-#### `heroku run bash`
-This command allows you to run terminal _on Heroku's servers_. This is a handy way for us to poke around and run commands on our application (like seeding the database, and checking that everything was installed correctly).
+Testing the app is also somehow challenging, at first ,I was only able to send outbound messages to any phones, but can not receive any inbound messages, due to set up in twilio account and also the ports and firewall from the router. Later, I was able to testing the inbound messages with direct public ip and opening all the ports at my home with production. But can not duplicate at campus. Brause show me the "PostMan" addon from Chrome where I can fake and incoming messages as long as I set up my mock "messages" is similar to twilio. This is amazing.   

@@ -5,15 +5,10 @@
 <body>
   <%- include _navbar.ejs %>
   <h1><a href="/chatcenter">Chat Center</a></h1>
-  <p>You ChatRoom Name <%= chat.name%> <%= chat.number %>.</p>
+  <p>This ChatRoom's Name is: <%= chat.name%></p>
+  <p>Phone Number is: <%= chat.number %></p>
 
   <div id="messages">
-    <!-- this could be another partial, just FYI -->
-    <form id="new-message" data-id="<%= chat._id %>">
-      <input type="text" name="messagebody">
-      <input type="submit" value="Add your message">
-    </form>
-
     <h3>Messages List:</h3>
       <div class= "chatrooms list-group" id="message-list">
       <!--  display all the pizzas from the database-->
@@ -23,5 +18,6 @@
       <% }); %>
     </div>
   </div>
+  <% include ./_inputMsg %>
 </body>
 </html>
