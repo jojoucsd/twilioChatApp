@@ -28,7 +28,6 @@
           <% chats.forEach(function(chat) { %>
             <!-- interpolate the id into the link to take user to pizza show page -->
             <p><a href="/chats/<%= chat._id %>"><%= chat.name %> <%= chat.number %></a><span data-id="<%= chat._id %>" class='glyphicon glyphicon-hdd pull-right'></span></p>
-
             <% }); %>
           </div>
         </div>

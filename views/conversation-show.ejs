@@ -7,7 +7,8 @@
   <h1><a href="/chatcenter">Chat Center</a></h1>
   <p>This ChatRoom's Name is: <%= chat.name%></p>
   <p>Phone Number is: <%= chat.number %></p>
-  <div class="col-md-4 col-md-offset-4">   
+  <p>Called From: <%= message.FromCity %> <% = messages.FromState %></p>
+  <div class="col-md-4 col-md-offset-6">   
     <div id="messages">
       <h3>Messages List:</h3>
       <div class= "chatrooms list-group" id="message-list">

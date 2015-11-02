@@ -7,7 +7,7 @@ $(document).ready(function(){
 
   socket.on('message', function(msg){
     //console.log("this msg is ", msg)
-    $('#messages').append($('<li>').text(msg.Body));
+    $('#messages').append($('<p>').text(msg.Body));
   });
 
   $("#newConversation").on("submit", function(e){

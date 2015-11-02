@@ -1,7 +1,7 @@
 .navbar {
 	margin:0;
 }
-html, body {
+/*html, body {
   height: 100%
 }
 
@@ -12,10 +12,16 @@ p {
 
 .jumbotron {
 	text-align: center;
-	color: black;
+	color: white;
+	background-image: url(http://thumbs.anyclip.com/to0ph5Vq3/tmb_76_480.jpg);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: 70%;
+
+
 }
 
 .container { margin: 0; padding: 0; box-sizing: border-box; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }*/
+      #messages li:nth-child(odd) { background: #eee; }*/*/
