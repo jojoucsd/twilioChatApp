@@ -3,30 +3,37 @@
   <%- include _head.ejs %>
 
 <body>
+
+<!-- ==== Nav Plug-In ==== -->
+
   <%- include _navbar.ejs %>
 
-  <div class="jumbotron text-center">
-    <div class="container">
-      <h1>Text for Medical Help</h1>
+<!-- ==== End Nav ==== -->
+
+<div class="jumbotron text-left">
+  <div class="container special">
+    <br><br><br><br><br>
+    <h1>Text for Medical Help</h1>
       <div class="lead"><b>Send SMS To:</b> +1.650.416.8665</div>
-    </div>
+      <div class="intro-boxes">
+        <br><br><br>
+        <div class="flip-container" ontouchstart="this.classList.toggle('hover');">
+          <div class="flipper">
+            <div class="front">
+              <!-- front content -->
+              <h4>Have a health question? </h4>
+              <h5>Glad we can help! start chatting with a professional nurse and reduce your trip to visit a doctor</h5>
+            </div>
+            <div class="back">
+              <!-- back content -->
+            <h4>Medivac an online medical help desk desgin to fast response to daily health problem</h4>
+            <h5>Sign up today and let us be your pocket nurse!</h5>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
-  <div class="container">
-  	<hr>
-  	<div class="row">
-  		<div class="col-sm-4">
-  			<h3 class='text-center'>ToDos</h3>
-  			<div class="lead">todo lists of today's agendas</div>
-  		</div>
-  		<div class="col-sm-4">
-  			<h3 class='text-center'>Completed</h3>
-  			<div class="lead">list of completed task</div>
-  		</div>
-  		<div class="col-sm-4">
-  			<h3 class='text-center'>Message Alert</h3>
-  			<div class="lead">Alert how many unread messages since AFK</div>
-  		</div>
-  	</div>
-  </div>
+</div>
+
 </body>
 </html>

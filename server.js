@@ -54,7 +54,12 @@ app.post('/users', function (req, res) {
 	console.log(req.body);
 	db.User.createSecure(req.body.email, req.body.password, function (err, newUser) {
 		req.session.userId = newUser._id;
-		res.redirect('/chatcenter');
+		if(err){
+			console.log(err);
+		} else {
+			res.json(newUser);
+		}
+		//res.redirect('/chatcenter');
 	});
 });
 
@@ -70,7 +75,12 @@ app.post('/sessions', function (req, res) {
   	} else {
   		console.log('setting session user id ', loggedInUser._id);
   		req.session.userId = loggedInUser._id;
-  		res.redirect('/chatcenter');
+  		if(err){
+  			console.log(err);
+  		} else {
+  			res.json(loggedInUser);
+  		}
+   		//res.redirect('/chatcenter');
   	}
   });
 });

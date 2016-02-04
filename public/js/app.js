@@ -2,6 +2,8 @@
 
 $(document).ready(function(){
   console.log('Hey, Earth!')
+
+  $('#username').focus();
   // io is listening
   var socket = io();
 
@@ -29,18 +31,18 @@ $(document).ready(function(){
     });
   });
 
-      $('#new-message').on('submit', function(e) {
-        e.preventDefault();
-  
-        var messageData = $("[name='messagebody']", this).val();
-        console.log("t is ",messageData)
-        var input = { "message" : messageData,
-        chatId : $(this).data().id
-        }
-        console.log("input is ", input);
+  $('#new-message').on('submit', function(e) {
+    e.preventDefault();
 
-        var url = "/chats/" + $(this).data().id + "/messages"
-        $.post(url, input, function(message) {
+    var messageData = $("[name='messagebody']", this).val();
+    console.log("t is ",messageData)
+    var input = { "message" : messageData,
+    chatId : $(this).data().id
+  }
+  console.log("input is ", input);
+
+  var url = "/chats/" + $(this).data().id + "/messages"
+  $.post(url, input, function(message) {
           // make HTML string to append to page
           var newMessage = "<p>" + message.Body + "</p>";
           
@@ -48,26 +50,73 @@ $(document).ready(function(){
           $("#new-message")[0].reset();
           $("#textbody").focus();
         })
-      })
+})
 //Delete listener, but should be a move to archive 
-      $('.chatrooms').on('click', '.glyphicon', function(e) {
-        e.preventDefault();
+$('.chatrooms').on('click', '.glyphicon', function(e) {
+  e.preventDefault();
 //        console.log("deleteing");
 
-        var chatId = $(this).data().id;
-        console.log(chatId);
-        var chat = $(this).closest('p');
+var chatId = $(this).data().id;
+console.log(chatId);
+var chat = $(this).closest('p');
 
-        $.ajax({
-          type: "DELETE",
-          url: '/chats/' + chatId
-        })
-        .done(function(data) {
-          console.log(data);
-          $(chat).remove();
-        })
-        .fail(function(data){
+$.ajax({
+  type: "DELETE",
+  url: '/chats/' + chatId
+})
+.done(function(data) {
+  console.log(data);
+  $(chat).remove();
+})
+.fail(function(data){
         //  console.log("Failed to terminate a chat !")
-        })
       })
+})
+
+$('#signup-form').on('submit', function(e) {
+  e.preventDefault();
+  var user = $(this).serialize();
+  console.log(user);
+
+  $.post('/users', user, function (data){
+
+  })
+  .success(function (data) {
+    console.log("logged in" , data);
+    $('.logged-out').hide();
+    window.location.href = '/chatcenter';
+  })
+  .error(function (data) {
+    console.log("failed to create a new user");
+
+  })
+})
+
+$('#login-form').on('submit', function(e) {
+  e.preventDefault();
+  var user = $(this).serialize();
+  console.log(user);
+
+  $.post('/sessions', user, function (data){
+
+  })
+  .success(function (data) {
+    console.log("logged in" , data);
+    $('.logged-out').hide();
+    window.location.href = '/chatcenter';
+
+
+  })
+  .error(function (data) {
+    console.log(data);
+    alert("sign up failed");
+  })
+})
+$('#logout').click(function (e) {
+  e.preventDefault();
+
+  $.get('/logout', function (data) {
+    window.location.href = '/';
+  })
+})
 });

@@ -11,7 +11,7 @@
     <h4>Greeting!
                 <% if (user && user.email) { %>
                   You're logged in as <%= user.email %>!</h1>
-                  <a href="/logout" class="btn btn-default">Log Out</a>
+                  <a href="/logout" class="btn btn-default" id="logout">Log Out</a>
                 <% } else { %>
                   You're not logged in. </h4>
                   <a href="/">Log in</a>
