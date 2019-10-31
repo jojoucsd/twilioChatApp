@@ -11,6 +11,7 @@ var fs = require ('fs');
 var qs = require('querystring');
 var io = require('socket.io')(http);
 var session =  require('express-session');
+let jsonData = require('./quotes.json');
 // require and load ENV variables
 require('dotenv').load();
 
@@ -85,6 +86,13 @@ app.post('/sessions', function (req, res) {
   });
 });
 
+const fetchquote = async () =>{
+	const res = await fetch('https://talaikis.com/api/quotes/random/');
+  const jsonObject = await res.json();
+  console.log(jsonObject.quote)
+}
+
+fetchquote();
 //loged in main page
 // shows all chats
 app.get('/chatcenter', function (req, res) {
@@ -115,13 +123,13 @@ app.get('/logout', function (req, res) {
 
 //Rotues for Main App
 app.post('/chats', function (req, res){	
-	//console.log(req.body);
+	console.log(req.body);
 	//create chats and save to MongoDB
 	db.Chat.create(req.body, function(err, chat){
 		if(err) {
 			res.json(err);
 		} else {
-			//console.log(chat);
+			console.log(chat);
 			res.json(chat);
 		} 
 	})
@@ -141,11 +149,11 @@ app.get('/chats/:_id', function (req, res){
 
 //should not be an delete route, will need to change in the future
 app.delete('/chats/:_id', function (req, res){
-	//console.log("chat id is", req.params);
+	console.log("chat id is", req.params);
 	db.Chat.find({
 		_id: req.params._id
 	}).remove(function(err, chat){
-	//	console.log("Chat Removed");
+		console.log("Chat Removed");
 		res.json("Chat Gone?")
 	})
 })
@@ -171,8 +179,8 @@ app.post('/chats/:_id/messages', function (req, res) {
 			console.log(message.sid);
 			// res.send(message.sid);
 		})
-		//console.log('message is: ', message);
-		//console.log('this chatroom messages are: ', chat.messages);
+		console.log('message is: ', message);
+		console.log('this chatroom messages are: ', chat.messages);
 		// response to my browser client
 		res.json(message);
 	})
@@ -192,10 +200,10 @@ function createMessage(chat, message, callback) {
 //inbound msg route
 app.post('/message/recieve', function (req, res) {
 	// Recieve message
-//	console.log(req.body);
+	console.log(req.body);
 	var message = req.body;
-//	console.log("incoming is :", message);
-//	 	console.log(message.From)
+	console.log("incoming is :", message);
+	 	console.log(message.From)
 	 	db.Chat.findOne({number: parseInt(message.From)}).exec(function (err, chat) {
 	 		if (!chat) {
 	 			db.Chat.create({ number: message.From }, function(err, chat) {
