@@ -1,7 +1,7 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var User = require('./users.js')
-var Message = require('./message.js')
+var mongoose = require('mongoose'),
+	Schema = mongoose.Schema,
+	User = require('./users.js'),
+	Message = require('./message.js');
 
 var ChatSchema = new Schema({
 	name: {type: String, require: true},
