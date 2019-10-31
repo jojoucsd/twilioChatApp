@@ -11,6 +11,7 @@ var fs = require ('fs');
 var qs = require('querystring');
 var io = require('socket.io')(http);
 var session =  require('express-session');
+let jsonData = require('./quotes.json');
 // require and load ENV variables
 require('dotenv').load();
 
@@ -85,6 +86,13 @@ app.post('/sessions', function (req, res) {
   });
 });
 
+const fetchquote = async () =>{
+	const res = await fetch('https://talaikis.com/api/quotes/random/');
+  const jsonObject = await res.json();
+  console.log(jsonObject.quote)
+}
+
+fetchquote();
 //loged in main page
 // shows all chats
 app.get('/chatcenter', function (req, res) {
