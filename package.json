@@ -7,7 +7,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "bcrypt": "^0.8.5",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.14.1",
     "dotenv": "^1.2.0",
     "ejs": "^2.3.4",
